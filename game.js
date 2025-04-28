@@ -64,7 +64,7 @@ for (let i = 0; i < 100; i++) {
 let coin = {
   x: canvas.width + 500,
   y: Math.random() * (canvas.height - 100) + 50,
-  width: 65,
+  width: 65,  // Coin is bigger now
   height: 75,
   speed: 2
 };
@@ -92,15 +92,18 @@ function awardBadge(score) {
   else if (score === 30) latestBadge = "Sky Legend";
 }
 
+// Create new pipe
 function createPipe() {
   const pipeY = Math.floor(Math.random() * (canvas.height - pipeGap - 100)) + 50;
   pipes.push({ x: canvas.width, y: pipeY });
 }
 
+// Update funny comment
 function updateFunnyComment() {
   currentFunnyComment = funnyComments[Math.floor(Math.random() * funnyComments.length)];
 }
 
+// Reset game
 function resetGame() {
   birdY = 0;
   velocity = 0;
@@ -117,27 +120,19 @@ function resetGame() {
   backgroundMusic.play();
 }
 
-// Controls for desktop (Spacebar)
+// Controls
 window.addEventListener('keydown', function (event) {
   if (event.key === ' ') {
     velocity = lift;
   }
 });
 
-// Controls for mobile (Tap anywhere)
-canvas.addEventListener('click', () => {
-  velocity = lift;
-});
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  velocity = lift;
-});
-
-// Restart button
+// Restart
 document.getElementById('restartBtn').addEventListener('click', () => {
   resetGame();
 });
 
+// Update game
 function update() {
   if (gameOver) {
     backgroundMusic.pause();
@@ -152,6 +147,7 @@ function update() {
     bgX = 0;
   }
 
+  // Update stars
   stars.forEach(star => {
     star.x -= star.speed;
     if (star.x < 0) {
@@ -164,12 +160,14 @@ function update() {
     }
   });
 
+  // Coin movement
   coin.x -= coin.speed;
   if (coin.x + coin.width < 0) {
     coin.x = canvas.width + Math.random() * 500;
-    coin.y = Math.min(Math.max(Math.random() * canvas.height, 50), canvas.height - 100);
+    coin.y = Math.random() * (canvas.height - 100) + 50;
   }
 
+  // Create pipes
   if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - pipeSpacing) {
     createPipe();
   }
@@ -220,6 +218,7 @@ function update() {
     }
   }
 
+  // Coin collection
   if (birdX < coin.x + coin.width &&
     birdX + birdWidth > coin.x &&
     birdY < coin.y + coin.height &&
@@ -227,10 +226,11 @@ function update() {
     score += 5;
     updateFunnyComment();
     coin.x = canvas.width + Math.random() * 500;
-    coin.y = Math.min(Math.max(Math.random() * canvas.height, 50), canvas.height - 100);
+    coin.y = Math.random() * (canvas.height - 100) + 50;
   }
 }
 
+// Draw stars
 function drawStars() {
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -245,6 +245,7 @@ function drawStars() {
   ctx.globalAlpha = 1;
 }
 
+// Draw pipes
 function drawPipes() {
   pipes.forEach(pipe => {
     const gradient = ctx.createLinearGradient(pipe.x, 0, pipe.x + 80, pipe.y + pipeGap);
@@ -272,11 +273,13 @@ function drawPipes() {
   });
 }
 
+// Draw all
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawStars();
 
+  // Moving background
   ctx.drawImage(bgImage, bgX, 0, canvas.width, canvas.height);
   ctx.drawImage(bgImage, bgX + canvas.width, 0, canvas.width, canvas.height);
 
@@ -284,6 +287,7 @@ function draw() {
   ctx.drawImage(birdImage, birdX, birdY, birdWidth, birdHeight);
   ctx.drawImage(coinImage, coin.x, coin.y, coin.width, coin.height);
 
+  // Score Box
   ctx.fillStyle = 'rgba(255,255,255,0.8)';
   ctx.fillRect(10, 10, 250, 100);
   ctx.fillStyle = 'black';
@@ -291,6 +295,7 @@ function draw() {
   ctx.fillText(`Score: ${score}`, 30, 50);
   ctx.fillText(`High Score: ${highScore}`, 30, 90);
 
+  // Badge Box (smaller)
   ctx.fillStyle = 'rgba(135,206,250,0.8)';
   ctx.fillRect(10, 130, 250, 80);
   ctx.fillStyle = 'black';
@@ -299,11 +304,8 @@ function draw() {
   ctx.font = '18px Times New Roman';
   ctx.fillText(latestBadge, 30, 190);
 
-  ctx.fillStyle = 'rgba(255,182,193,0.8)';
-  ctx.fillRect(canvas.width - 410, 10, 400, 100);
+  // Funny comment display (outside box)
   ctx.fillStyle = 'black';
-  ctx.font = '20px Times New Roman';
-  ctx.fillText('Funny Comment:', canvas.width - 390, 40);
   ctx.font = '18px Times New Roman';
   ctx.fillText(currentFunnyComment, canvas.width - 390, 80);
 
@@ -316,31 +318,20 @@ function draw() {
   }
 }
 
+// Game loop
 function gameLoop() {
   update();
   draw();
   requestAnimationFrame(gameLoop);
 }
 
+// Resize
 window.addEventListener('resize', () => {
-  const prevWidth = canvas.width;
-  const prevHeight = canvas.height;
-
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-
   birdX = canvas.width / 3;
-  birdY = (birdY / prevHeight) * canvas.height;
-
-  stars.forEach(star => {
-    star.x = Math.random() * canvas.width;
-    star.y = Math.random() * canvas.height;
-  });
-
-  coin.y = Math.min(Math.max(Math.random() * canvas.height, 50), canvas.height - 100);
 });
 
 gameLoop();
-
 
 
